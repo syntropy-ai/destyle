@@ -1,0 +1,25 @@
+{
+  "name": "destyle",
+  "version": "0.0.1",
+  "description": "Decouple your react component logic from your style logic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syntropy-ai/destyle.git"
+  },
+  "keywords": [
+    "react",
+    "css",
+    "style",
+    "decouple"
+  ],
+  "author": "Syntropy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/syntropy-ai/destyle/issues"
+  },
+  "homepage": "https://github.com/syntropy-ai/destyle#readme"
+}
