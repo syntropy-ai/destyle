@@ -34,9 +34,9 @@ const destyle = (TheComponent, name) => {
   const HOCName = `destyle(${name ||
     getDisplayName(TheComponent)})`
 
-  const HOC = ({ stylerName = HOCName, ...rest }) => (
+  const HOC = ({ destyleName = name, ...rest }) => (
     <TheComponent
-      styles={styleFunc(stylerName, rest)}
+      styles={styleFunc(destyleName, rest)}
       {...rest}
     />
   )
@@ -46,16 +46,21 @@ const destyle = (TheComponent, name) => {
   return HOC
 }
 
-const setStyles = (nameOrComponent, styleObject) => {
-  const name =
-    typeof nameOrComponent === 'string'
-      ? `destyle(${nameOrComponent})`
-      : getDisplayName(nameOrComponent)
-
+const setStyles = (name, styleObject) => {
   styles[name] = {
     ...styles[name],
     ...styleObject
   }
 }
 
-export { destyle, setStyles }
+const addStyles = (name, styleObject) => {
+  const namespace = styles[name]
+  Object.keys(styleObject).forEach(k => {
+    namespace[k] = {
+      ...(namespace[k] || {}),
+      ...styleObject[k]
+    }
+  })
+}
+
+export { destyle, setStyles, addStyles }
