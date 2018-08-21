@@ -30,6 +30,7 @@ var objectWithoutProperties = function (obj, keys) {
 var styles = {};
 
 var styleFunc = function styleFunc(name, props) {
+  console.log('styleFunc name: ' + name + ', props: ', props);
   var item = styles[name] || {};
   var result = {};
   Object.keys(item).forEach(function (key) {
@@ -49,7 +50,6 @@ var styleFunc = function styleFunc(name, props) {
 
 var getDisplayName = function getDisplayName(WrappedComponent) {
   // TODO: add error here for providing anonymous stateless components as we need a name if none is provided
-
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 };
 
@@ -71,9 +71,11 @@ var destyle = function destyle(TheComponent, name) {
 };
 
 var setStyles = function setStyles(nameOrComponent, styleObject) {
-  var name = typeof nameOrComponent === 'string' ? nameOrComponent : getDisplayName(nameOrComponent);
+  var name = typeof nameOrComponent === 'string' ? 'destyle(' + nameOrComponent + ')' : getDisplayName(nameOrComponent);
 
   styles[name] = _extends({}, styles[name], styleObject);
+  console.log('setStyles on ' + name + ': ', styleObject);
+  console.log(styles);
 };
 
 export { destyle, setStyles };

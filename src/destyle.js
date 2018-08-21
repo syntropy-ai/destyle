@@ -23,7 +23,6 @@ const styleFunc = (name, props) => {
 
 const getDisplayName = WrappedComponent => {
   // TODO: add error here for providing anonymous stateless components as we need a name if none is provided
-
   return (
     WrappedComponent.displayName ||
     WrappedComponent.name ||
@@ -50,7 +49,7 @@ const destyle = (TheComponent, name) => {
 const setStyles = (nameOrComponent, styleObject) => {
   const name =
     typeof nameOrComponent === 'string'
-      ? nameOrComponent
+      ? `destyle(${nameOrComponent})`
       : getDisplayName(nameOrComponent)
 
   styles[name] = {
