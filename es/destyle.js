@@ -26,41 +26,69 @@ var objectWithoutProperties = function (obj, keys) {
   return target;
 };
 
-// style cache
-var styles = {};
+var defaultConcatenator = function defaultConcatenator(styleList) {
+  return styleList.join(' ');
+};
 
-var styleFunc = function styleFunc(name, props) {
-  var item = styles[name] || {};
-  var result = {};
-  Object.keys(item).forEach(function (key) {
-    Object.defineProperty(result, key, {
+// config
+var config = {
+  concatenator: defaultConcatenator
+
+  // style cache
+};var styles = {};
+
+var setConcatenator = function setConcatenator(con) {
+  return config.concatenator = con;
+};
+
+var styleFunc = function styleFunc(names, props) {
+  // create merged value object
+  var merged = names.reduce(function (obj, name) {
+    var item = styles[name] || {};
+    Object.keys(item).forEach(function (k) {
+      obj[k] = obj[k] || [];
+      obj[k] = obj[k].concat(item[k]);
+    });
+    return obj;
+  }, {});
+
+  // replace the value array with a prop getter
+  return Object.keys(merged).reduce(function (obj, key) {
+    return Object.defineProperty(obj, key, {
       get: function get$$1() {
-        var style = item[key];
-        if (typeof style === 'function') {
-          return style(props);
-        } else {
-          return style;
-        }
+        var styleList = merged[key].map(function (style) {
+          if (typeof style === 'function') {
+            return style(props);
+          } else {
+            return style;
+          }
+        });
+        return config.concatenator(styleList);
       }
     });
-  });
-  return result;
+  }, {});
 };
 
 var getDisplayName = function getDisplayName(WrappedComponent) {
+  var defaultName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Component';
+
   // TODO: add error here for providing anonymous stateless components as we need a name if none is provided
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  return WrappedComponent.displayName || WrappedComponent.name || defaultName;
 };
 
 var destyle = function destyle(TheComponent, name) {
-  var HOCName = 'destyle(' + (name || getDisplayName(TheComponent)) + ')';
+  var HOCName = 'destyle(' + getDisplayName(TheComponent, name) + ')';
 
   var HOC = function HOC(_ref) {
-    var _ref$destyleName = _ref.destyleName,
-        destyleName = _ref$destyleName === undefined ? name : _ref$destyleName,
-        rest = objectWithoutProperties(_ref, ['destyleName']);
+    var _ref$destyleNames = _ref.destyleNames,
+        destyleNames = _ref$destyleNames === undefined ? '' : _ref$destyleNames,
+        rest = objectWithoutProperties(_ref, ['destyleNames']);
+
+    var names = destyleNames.split(' ');
+    names.unshift(name);
+
     return React.createElement(TheComponent, _extends({
-      styles: styleFunc(destyleName, rest)
+      styles: styleFunc(names, rest)
     }, rest));
   };
 
@@ -70,14 +98,20 @@ var destyle = function destyle(TheComponent, name) {
 };
 
 var setStyles = function setStyles(name, styleObject) {
-  styles[name] = _extends({}, styles[name], styleObject);
-};
-
-var addStyles = function addStyles(name, styleObject) {
-  var namespace = styles[name];
+  styles[name] = styles[name] || {};
+  var style = styles[name];
   Object.keys(styleObject).forEach(function (k) {
-    namespace[k] = _extends({}, namespace[k] || {}, styleObject[k]);
+    style[k] = [styleObject[k]];
   });
 };
 
-export { destyle, setStyles, addStyles };
+var addStyles = function addStyles(name, styleObject) {
+  var namespace = styles[name] || {};
+  Object.keys(styleObject).forEach(function (k) {
+    namespace[k] = namespace[k] || [];
+    namespace[k].push(styleObject[k]);
+  });
+  styles[name] = namespace;
+};
+
+export { destyle, setConcatenator, setStyles, addStyles };
