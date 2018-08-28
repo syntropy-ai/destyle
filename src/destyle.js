@@ -29,7 +29,7 @@ const styleFunc = (names, props) => {
       get: function() {
         const styleList = merged[key].map(style => {
           if (typeof style === 'function') {
-            return style(props)
+            return style(props, this)
           } else {
             return style
           }

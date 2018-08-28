@@ -1,6 +1,6 @@
 {
   "name": "destyle",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Decouple your react component logic from your style logic",
   "main": "lib/destyle.js",
   "scripts": {
@@ -35,7 +35,6 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^5.2.0",
-    "react": "^16.4.2",
     "rimraf": "^2.6.2",
     "rollup": "^0.63.5",
     "rollup-plugin-babel": "^3.0.7",
