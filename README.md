@@ -128,4 +128,4 @@ We are happy to discuss any new ideas in the issues.
 
 ---
 
-Made by [Syntropy](http://www.syntropy.xyz)
+Made by [Syntropy](https://www.syntropy.xyz)
