@@ -3,15 +3,19 @@ import babel from 'rollup-plugin-babel'
 import replace from 'rollup-plugin-replace'
 import { uglify } from 'rollup-plugin-uglify'
 
+const globals = {
+  react: 'React'
+}
+
 const env = process.env.NODE_ENV
 const config = {
   input: 'src/destyle.js',
-  plugins: []
+  plugins: [],
+  external: ['react']
 }
 
 if (env === 'es' || env === 'cjs') {
-  config.output = { format: env, indent: false }
-  config.external = ['symbol-observable']
+  config.output = { globals, format: env, indent: false }
   config.plugins.push(
     babel({
       plugins: ['external-helpers']
@@ -21,6 +25,7 @@ if (env === 'es' || env === 'cjs') {
 
 if (env === 'development' || env === 'production') {
   config.output = {
+    globals,
     format: 'umd',
     name: 'destyle',
     indent: false

@@ -1,45 +1,74 @@
 import React from 'react'
 
+const defaultConcatenator = styleList => styleList.join(' ')
+
+// config
+const config = {
+  concatenator: defaultConcatenator
+}
+
 // style cache
 const styles = {}
 
-const styleFunc = (name, props) => {
-  const item = styles[name] || {}
-  const result = {}
-  Object.keys(item).forEach(key => {
-    Object.defineProperty(result, key, {
+const setConcatenator = con => (config.concatenator = con)
+
+const styleFunc = (names, props) => {
+  // create merged value object
+  const merged = names.reduce((obj, name) => {
+    const item = styles[name] || {}
+    Object.keys(item).forEach(k => {
+      obj[k] = obj[k] || []
+      obj[k] = obj[k].concat(item[k])
+    })
+    return obj
+  }, {})
+
+  // replace the value array with a prop getter
+  return Object.keys(merged).reduce((obj, key) => {
+    return Object.defineProperty(obj, key, {
       get: function() {
-        const style = item[key]
-        if (typeof style === 'function') {
-          return style(props)
-        } else {
-          return style
-        }
+        const styleList = merged[key].map(style => {
+          if (typeof style === 'function') {
+            return style(props, this)
+          } else {
+            return style
+          }
+        })
+        return config.concatenator(styleList)
       }
     })
-  })
-  return result
+  }, {})
 }
 
-const getDisplayName = WrappedComponent => {
+const getDisplayName = (
+  WrappedComponent,
+  defaultName = 'Component'
+) => {
   // TODO: add error here for providing anonymous stateless components as we need a name if none is provided
   return (
     WrappedComponent.displayName ||
     WrappedComponent.name ||
-    'Component'
+    defaultName
   )
 }
 
 const destyle = (TheComponent, name) => {
-  const HOCName = `destyle(${name ||
-    getDisplayName(TheComponent)})`
+  const HOCName = `destyle(${getDisplayName(
+    TheComponent,
+    name
+  )})`
 
-  const HOC = ({ destyleName = name, ...rest }) => (
-    <TheComponent
-      styles={styleFunc(destyleName, rest)}
-      {...rest}
-    />
-  )
+  const HOC = ({ destyleNames = '', ...rest }) => {
+    const names = destyleNames.split(' ')
+    names.unshift(name)
+
+    return (
+      <TheComponent
+        styles={styleFunc(names, rest)}
+        {...rest}
+      />
+    )
+  }
 
   HOC.displayName = HOCName
 
@@ -47,20 +76,20 @@ const destyle = (TheComponent, name) => {
 }
 
 const setStyles = (name, styleObject) => {
-  styles[name] = {
-    ...styles[name],
-    ...styleObject
-  }
-}
-
-const addStyles = (name, styleObject) => {
-  const namespace = styles[name]
+  styles[name] = styles[name] || {}
+  const style = styles[name]
   Object.keys(styleObject).forEach(k => {
-    namespace[k] = {
-      ...(namespace[k] || {}),
-      ...styleObject[k]
-    }
+    style[k] = [styleObject[k]]
   })
 }
 
-export { destyle, setStyles, addStyles }
+const addStyles = (name, styleObject) => {
+  const namespace = styles[name] || {}
+  Object.keys(styleObject).forEach(k => {
+    namespace[k] = namespace[k] || []
+    namespace[k].push(styleObject[k])
+  })
+  styles[name] = namespace
+}
+
+export { destyle, setConcatenator, setStyles, addStyles }
