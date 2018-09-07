@@ -41,11 +41,11 @@ destyle - _(complete decoupling)_
 npm install destyle --save
 ```
 
-##### Demo
+#### Demo
 
 [![Edit w2x0260z75](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/w2x0260z75)
 
-##### Building Components
+#### Building Components
 
 destyle is a HOC, that you wrap around your component and provide a namespace. It injects a `styles` property into your component which you provide semantic keys to your markup. For example:
 
@@ -69,7 +69,7 @@ const UserCard = ({ styles }) => (
 export default destyle(UserCard, 'UserCardStyles')
 ```
 
-##### Writing styles
+#### Writing styles
 
 Then **_anywhere_** in your application, you can use these two functions to set styles on namespace keys:
 
@@ -102,7 +102,7 @@ addStyles('UserCardStyles', {
 
 Notice how you can easily use props to determine your styling, and those props don't even need to be mentioned inside your component. They are pure styling logic props.
 
-##### Extending namespaces
+#### Extending namespaces
 
 In the event that you really don't want to use a prop to determine the styling, you can pass extra namespaces into the `destyleNames` prop when using your component. This will apply the original namespace first, and then the order of the added namespaces. To control how these namespaces get concatenated, you can override the default string concatenation with:
 
