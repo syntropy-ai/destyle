@@ -100,7 +100,7 @@ addStyles('UserCardStyles', {
 })
 ```
 
-Notice how you can easily use props to determine your styling, and those props don't even need to be mentioned inside your component. They are pure styling logic props.
+Notice how you can easily use props to determine your styling, and those props don't even need to be mentioned inside your component. They are pure styling logic props. You can also provide state as a second argument which will allow you to use your wrapped components local state to determine styling.
 
 #### Extending namespaces
 

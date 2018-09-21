@@ -1,6 +1,6 @@
 {
   "name": "destyle",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Decouple your react component logic from your style logic",
   "main": "lib/destyle.js",
   "scripts": {
