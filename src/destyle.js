@@ -84,7 +84,7 @@ const destyle = (TheComponent, name) => {
       })
     }
 
-    render() {
+    render = () => {
       const { destyleNames } = this.props
       const names = destyleNames
         ? destyleNames.split(' ')
