@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+const flatten = arr => arr.reduce((a, b) => a.concat(b), [])
+
 const defaultConcatenator = styleList => styleList.join(' ')
 
 // config
@@ -55,47 +57,65 @@ const destyle = (TheComponent, name) => {
   }
 
   class InnerComponent extends TheComponent {
-    styleFunc = (stylesObj, names) => {
-      // create merged value object
-      const merged = names.reduce((obj, name) => {
-        const item = styles[name] || {}
-        Object.keys(item).forEach(k => {
-          obj[k] = obj[k] || []
-          obj[k] = obj[k].concat(item[k])
+    styleFunc = (stylesObj, names, merge) => {
+      // go through each name and parse the styles
+      // providing props/state if a function
+      const parsed = flatten(
+        names.map(styleName => {
+          return (styles[styleName] || []).map(style => {
+            if (typeof style === 'function') {
+              return style(this.props, this.state)
+            } else {
+              return style
+            }
+          })
         })
-        return obj
-      }, {})
+      )
+      // append any merge preprocessed styles
+      if (merge) {
+        parsed.push(merge)
+      }
 
-      // replace the value array with a prop getter
-      Object.keys(merged).forEach(key => {
-        Object.defineProperty(stylesObj, key, {
-          configurable: true,
-          get: () => {
-            const styleList = merged[key].map(style => {
-              if (typeof style === 'function') {
-                return style(this.props, this.state)
-              } else {
-                return style
-              }
-            })
-            return config.concatenator(styleList)
-          }
-        })
+      // convert to keys with style arrays
+      const arrStyles = parsed.reduce(
+        (result, styleObj) => {
+          Object.keys(styleObj).forEach(k => {
+            if (!result[k]) {
+              result[k] = []
+            }
+            result[k].push(styleObj[k])
+          })
+          return result
+        },
+        {}
+      )
+
+      // do concatenation and put into styles prop
+      Object.keys(arrStyles).forEach(k => {
+        stylesObj[k] =
+          arrStyles[k].length > 1
+            ? config.concatenator(arrStyles[k])
+            : arrStyles[k]
       })
     }
 
     render() {
-      const { destyleNames } = this.props
-      const names = destyleNames
-        ? destyleNames.split(' ')
-        : []
+      const { destyleNames, destyleMerge } = this.props
+      const names = []
+      if (destyleNames) {
+        names.push(...destyleNames.split(' '))
+      }
       if (name) {
         names.unshift(name)
       }
 
       // modify the styles object passed to the wrapped render
-      if (names.length > 0) {
-        this.styleFunc(this.props.styles, names)
+      if (names.length > 0 || destyleMerge) {
+        this.styleFunc(
+          this.props.styles,
+          names,
+          destyleMerge
+        )
       }
 
       return super.render()
@@ -113,21 +133,13 @@ const destyle = (TheComponent, name) => {
   return HOC
 }
 
-const setStyles = (name, styleObject) => {
-  styles[name] = styles[name] || {}
-  const style = styles[name]
-  Object.keys(styleObject).forEach(k => {
-    style[k] = [styleObject[k]]
-  })
+const setStyles = (name, styleObjOrFunc) => {
+  styles[name] = [styleObjOrFunc]
 }
 
-const addStyles = (name, styleObject) => {
-  const namespace = styles[name] || {}
-  Object.keys(styleObject).forEach(k => {
-    namespace[k] = namespace[k] || []
-    namespace[k].push(styleObject[k])
-  })
-  styles[name] = namespace
+const addStyles = (name, styleObjOrFunc) => {
+  styles[name] = styles[name] || []
+  styles[name].push(styleObjOrFunc)
 }
 
 export { destyle, setConcatenator, setStyles, addStyles }
