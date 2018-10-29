@@ -73,42 +73,48 @@ export default destyle(UserCard, 'UserCardStyles')
 
 Then **_anywhere_** in your application, you can use these two functions to set styles on namespace keys:
 
-`setStyles(namespace, stylesObj)` or `addStyles(namespace, stylesObj)`
+`setStyles(namespace, stylesObjectOrFunction)` or `addStyles(namespace, stylesObjOrFunction)`
 
-The difference between these two functions is simply that `addStyles` performs a styles merge, rather than an overwrite. Styles can be both static, or a **function** that receives props of the consumer. For example (_using emotion, however any styling lib including traditional css is fine_):
+The difference between these two functions is that `addStyles` pushes the object to an array that is concatenated in order, while `setStyles` performs a complete overwrite. Styles can be both static, or a **function** that receives props of the consumer. For example (_using emotion, however any styling lib including traditional css is fine_):
 
 ```javascript
 import { addStyles } from 'destyle'
 import { css } from 'emotion'
 
-addStyles('UserCardStyles', {
+addStyles('UserCardStyles', (props, state) => ({
   container: css`
     font-family: 'Arial';
     background-color: #f5f5f5;
     height: 96px;
     width: 100%;
   `,
-  avatar: props => css`
+  avatar: css`
     float: left;
     height: 96px;
     width: 96px;
     border-right-style: solid;
     border-right-width: 4px;
-    border-right-color: props.active ? #D05E5E : #111;
+    border-right-color: ${props.active ? #D05E5E : #111};
   `
   // Rest of your styles
-})
+}))
 ```
 
-Notice how you can easily use props to determine your styling, and those props don't even need to be mentioned inside your component. They are pure styling logic props. You can also provide state as a second argument which will allow you to use your wrapped components local state to determine styling.
+Notice how you can easily use props to determine your styling, and those props don't even need to be mentioned inside your component. They are pure styling logic props. You can also provide `state` as a second argument which will allow you to use your wrapped components local state to determine styling.
 
-#### Extending namespaces
+#### Concatenation
 
-In the event that you really don't want to use a prop to determine the styling, you can pass extra namespaces into the `destyleNames` prop when using your component. This will apply the original namespace first, and then the order of the added namespaces. To control how these namespaces get concatenated, you can override the default string concatenation with:
+To control how namespaces get concatenated, you can override the default string concatenation with:
 
 `setConcatenator(concatenatorFunction)`
 
 For example, if you use say `emotion` with destyle, you can set the concatentor to `cx` with `setConcatenator(cx)`
+
+#### Extending namespaces & Merging styles from elsewhere
+
+In the event that you really don't want to use a prop to determine the styling, you can pass extra namespaces into the `destyleNames` prop when using your component. This will apply the original namespace first, and then the order of the added namespaces.
+
+You can also use the `destyleMerge` prop to pass in preprocessed styles directly (not namespaced). This can be useful for passing parent styles directly down to children.
 
 ---
 
