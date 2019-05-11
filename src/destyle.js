@@ -30,12 +30,7 @@ const useStyles = (key, props, ...extra) => {
     return [{}, updater]
   }
 
-  const result = Object.keys(namespace).reduce((r, k) => {
-    r[k] = namespace[k](props, ...extra)
-    return r
-  }, {})
-
-  return [result, updater]
+  return [namespace(props, ...extra), updater]
 }
 
 const useClasses = useStyles
