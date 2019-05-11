@@ -1,95 +1,42 @@
-import React from 'react'
+import React, {
+  useState,
+  useReducer,
+  useContext
+} from 'react'
 
-const defaultConcatenator = styleList => styleList.join(' ')
+const StyleContext = createContext()
 
-// config
-const config = {
-  concatenator: defaultConcatenator
-}
+const StyleProvider = ({ children, theme, reducer }) => {
+  const value = reducer
+    ? useReducer(reducer, theme)
+    : useState(theme)
 
-// style cache
-const styles = {}
-
-const setConcatenator = con => (config.concatenator = con)
-
-const styleFunc = (names, props) => {
-  // create merged value object
-  const merged = names.reduce((obj, name) => {
-    const item = styles[name] || {}
-    Object.keys(item).forEach(k => {
-      obj[k] = obj[k] || []
-      obj[k] = obj[k].concat(item[k])
-    })
-    return obj
-  }, {})
-
-  // replace the value array with a prop getter
-  return Object.keys(merged).reduce((obj, key) => {
-    return Object.defineProperty(obj, key, {
-      get: function() {
-        const styleList = merged[key].map(style => {
-          if (typeof style === 'function') {
-            return style(props, this)
-          } else {
-            return style
-          }
-        })
-        return config.concatenator(styleList)
-      }
-    })
-  }, {})
-}
-
-const getDisplayName = (
-  WrappedComponent,
-  defaultName = 'Component'
-) => {
-  // TODO: add error here for providing anonymous stateless components as we need a name if none is provided
   return (
-    WrappedComponent.displayName ||
-    WrappedComponent.name ||
-    defaultName
+    <StyleContext.Provider value={value}>
+      {children}
+    </StyleContext.Provider>
   )
 }
 
-const destyle = (TheComponent, name) => {
-  const HOCName = `destyle(${getDisplayName(
-    TheComponent,
-    name
-  )})`
+const useStyles = (key, props, ...extra) => {
+  const [theme, updater] = useContext(StyleContext)
+  const namespace = theme[key]
 
-  const HOC = ({ destyleNames = '', ...rest }) => {
-    const names = destyleNames.split(' ')
-    names.unshift(name)
-
-    return (
-      <TheComponent
-        styles={styleFunc(names, rest)}
-        {...rest}
-      />
+  if (!namespace) {
+    console.warn(
+      `Destyle: attempting to use namespace (${key}) which does not exist on theme.`
     )
+    return [{}, updater]
   }
 
-  HOC.displayName = HOCName
+  const result = Object.keys(namespace).reduce((r, k) => {
+    r[k] = namespace[k](props, ...extra)
+    return r
+  }, {})
 
-  return HOC
+  return [result, updater]
 }
 
-const setStyles = (name, styleObject) => {
-  styles[name] = styles[name] || {}
-  const style = styles[name]
-  Object.keys(styleObject).forEach(k => {
-    style[k] = [styleObject[k]]
-  })
-}
+const useClasses = useStyles
 
-const addStyles = (name, styleObject) => {
-  const namespace = styles[name] || {}
-  Object.keys(styleObject).forEach(k => {
-    namespace[k] = namespace[k] || []
-    namespace[k].push(styleObject[k])
-  })
-  styles[name] = namespace
-}
-
-export { destyle, setConcatenator, setStyles, addStyles }
+export { StyleProvider, useStyles, useClasses }

@@ -43,5 +43,8 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^4.0.0",
     "rollup-watch": "^4.3.1"
+  },
+  "dependencies": {
+    "react": "^16.8.6"
   }
 }
