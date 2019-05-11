@@ -45,7 +45,7 @@ npm install destyle --save
 
 #### Demo
 
-[![Edit w2x0260z75](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/009j9zwj7l)
+[![Edit 94jvkn010o](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/94jvkn010o?fontsize=14)
 
 #### Building Components
 
