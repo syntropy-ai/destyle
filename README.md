@@ -45,7 +45,7 @@ npm install destyle --save
 
 #### Demo
 
-[![Edit w2x0260z75](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/w2x0260z75)
+[![Edit w2x0260z75](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/009j9zwj7l)
 
 #### Building Components
 
@@ -87,13 +87,13 @@ const UserCardStyles = props => ({
     height: 96px;
     width: 100%;
   `,
-  avatar: props => css`
+  avatar: css`
     float: left;
     height: 96px;
     width: 96px;
     border-right-style: solid;
     border-right-width: 4px;
-    border-right-color: props.active ? #D05E5E : #111;
+    border-right-color: ${props.active ? #D05E5E : #111};
   `
   // Rest of your styles
 })
