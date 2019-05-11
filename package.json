@@ -1,6 +1,6 @@
 {
   "name": "destyle",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Decouple your react component logic from your style logic",
   "main": "lib/destyle.js",
   "scripts": {
@@ -44,5 +44,8 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^4.0.0",
     "rollup-watch": "^4.3.1"
+  },
+  "dependencies": {
+    "react": "^16.8.6"
   }
 }
