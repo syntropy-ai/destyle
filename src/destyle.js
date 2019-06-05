@@ -30,6 +30,12 @@ const useStyles = (key, props, ...extra) => {
     return [{}, updater]
   }
 
+  if (!props) {
+    console.warn(
+      `Destyle: props were not passed to namespace (${key}). Ensure useStyles(${key}, props).`
+    )
+  }
+
   return [namespace(props, ...extra), updater]
 }
 
