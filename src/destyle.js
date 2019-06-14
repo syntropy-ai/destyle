@@ -25,18 +25,22 @@ const useStyles = (key, props, ...extra) => {
 
   if (!namespace) {
     console.warn(
-      `Destyle: attempting to use namespace (${key}) which does not exist on theme.`
+      `Destyle: Attempting to use namespace (${key}) which does not exist on theme.`
     )
     return [{}, updater]
   }
 
   if (!props) {
     console.warn(
-      `Destyle: props were not passed to namespace (${key}). Ensure useStyles(${key}, props).`
+      `Destyle: No props were not passed to namespace (${key}). Try useStyles(${key}, props).`
     )
   }
 
-  return [namespace(props, ...extra), updater]
+  if (typeof namespace === 'function') {
+    return [namespace(props, ...extra), updater]
+  } else {
+    return [namespace, updater]
+  }
 }
 
 const useClasses = useStyles
