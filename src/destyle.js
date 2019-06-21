@@ -6,21 +6,35 @@ import React, {
 } from 'react'
 
 const StyleContext = createContext()
+const defaultConcatenator = (a, b) => `${a} ${b}`
 
-const StyleProvider = ({ children, theme, reducer }) => {
+const StyleProvider = ({
+  children,
+  theme,
+  reducer,
+  concatenatorProp = 'className',
+  concatenator = defaultConcatenator
+}) => {
   const value = reducer
     ? useReducer(reducer, theme)
     : useState(theme)
 
   return (
-    <StyleContext.Provider value={value}>
+    <StyleContext.Provider
+      value={[...value, concatenatorProp, concatenator]}
+    >
       {children}
     </StyleContext.Provider>
   )
 }
 
 const useStyles = (key, props, ...extra) => {
-  const [theme, updater] = useContext(StyleContext)
+  const [
+    theme,
+    updater,
+    concatenatorProp,
+    concatenator
+  ] = useContext(StyleContext)
   const namespace = theme[key]
 
   if (!namespace) {
@@ -36,11 +50,19 @@ const useStyles = (key, props, ...extra) => {
     )
   }
 
-  if (typeof namespace === 'function') {
-    return [namespace(props, ...extra), updater]
-  } else {
-    return [namespace, updater]
+  const styles =
+    typeof namespace === 'function'
+      ? namespace(props, ...extra)
+      : namespace
+
+  if (props[concatenatorProp]) {
+    const overrides = props[concatenatorProp]
+    Object.keys(overrides).forEach(k => {
+      styles[k] = concatenator(styles[k], overrides[k])
+    })
   }
+
+  return [styles, updater]
 }
 
 const useClasses = useStyles
