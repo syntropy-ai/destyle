@@ -59,6 +59,7 @@ const useStyles = (key, props, ...extra) => {
     const overrides = props[concatenatorProp]
     const res = Object.keys(overrides).reduce((r, k) => {
       r[k] = concatenator(styles[k], overrides[k])
+      return r
     }, {})
     return [{ ...styles, ...res }, updater]
   }
